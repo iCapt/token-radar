@@ -15,19 +15,34 @@ pre-token protocol, and writes a ranked board plus a static dashboard:
   token on record — 40 of them — is on the board.
 - **The early radar.** Every pre-token protocol below the floor that the watchlist's
   own rule would keep (no wrapped, staked or bridged product, no versioned pool, no
-  exchange product) joins it — 138 more rows, 178 in all.
-- **A value model the snapshot itself supplies.** Each category's multiple is the
-  median market-cap-to-TVL of the tokenized protocols in that category, computed
-  from the snapshot (global median where a category has too few). Implied value =
-  TVL x category multiple x growth x maturity, where growth follows the 7-day TVL
-  change and maturity follows how long the protocol has run with no token. No
-  protocol name is special-cased anywhere.
-- **A farm plan for every row.** Five steps each, derived from the protocol's
-  category, chains, TVL and age, with what each step costs and how long it takes.
-- **A dashboard a reader can use.** Sortable and filterable board, a detail view for
-  every protocol (with the value breakdown and the farm plan), a live-token table
-  that keeps the already-trading protocols apart, and the full methodology with the
-  per-category multiples table. Static HTML/CSS/JS, no network.
+  exchange product) joins it — 138 more rows, 178 in all. The 39 protocols below
+  the floor that record no token but are not launches of their own are listed with
+  their reasons, not ranked.
+- **A fitted value model the snapshot itself supplies.** The market-cap-to-TVL
+  multiple is fitted on the snapshot's own tokenized peers (n = 87 with a known
+  age): log(market-cap / TVL) = -1.417 - 0.635 x (log TVL - 17.44), plus a
+  category effect shrunk toward the global fit for small samples. Held out one
+  peer at a time, the fit misses by 1.924 log points (MAE 1.418), against 2.175
+  (MAE 1.665) for the median multiple alone; R² = 0.238. Growth and age were
+  tested as fitted terms the same way and carried no signal beyond TVL, so they
+  enter at fixed bounded weights.
+- **Token odds from the peers' own record.** Implied value is an expected value:
+  the value if the protocol launches, times the odds that it does — the share of
+  protocols in its category that record a token in this snapshot, shrunk toward
+  the global share 19.0%. Privacy leads at 35.0%, Risk Curators trail at 5.9%.
+- **A farm plan for every row.** Six steps each, derived from the protocol's
+  category, chains, TVL and age — including a category-specific advanced step and
+  a weekly action — with what each step costs and how long it takes, and a costed
+  summary (capital in position, gas over the hold, hold days).
+- **A dashboard a reader can use.** Sortable and filterable board, a detail view
+  for every protocol (verdict band, value breakdown with the fitted multiple and
+  token odds, evidence lines, farm plan and farm-cost box), a live-token table
+  that keeps the already-trading protocols apart, and the full methodology with
+  the fitted category effects, the token-odds table, the fit diagnostics and the
+  list of protocols left out. Static HTML/CSS/JS, no network.
+
+Top of the board: Tori Finance ($5.73M implied), Manta CeDeFi ($5.39M), Axis
+($5.29M), Aegis YUSD ($5.20M), Liminal Basis ($4.92M).
 
 ## Run it
 
@@ -49,7 +64,7 @@ toggle; select a row for its detail view. The URL hash carries the state
 ## Files
 
 - `main.ts` — entrypoint: snapshot in, board + dashboard + dossier out.
-- `lib/model.ts` — the model: multiples, implied value, board, farm plans.
+- `lib/model.ts` — the model: fitted multiple, token odds, implied value, board, farm plans.
 - `vendor/makefun-board.ts` — make.fun's dossier library, copied from the kit.
 - `dashboard/` — the static page: `index.html`, `app.css`, `app.js`.
 - `screenshots/` — the three screenshots: the board, a detail view, a filtered view.
